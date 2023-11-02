@@ -1,0 +1,46 @@
+version: "1.0"
+info:
+  model: int-scaffold
+packages:
+- name: EdgeNewTest
+  gitBranch: master
+- name: EdgeThirdPackage
+  gitServerName: SIQAPsurGit
+  gitUrl: https://github.com/prabhakarsag
+  gitUsername: prabhakarsag
+  gitToken: edge.scaffolding.EdgeThirdPackage.SIQAPsurGit.gitToken
+  gitBranch: main
+services:
+- serviceName: edge.newtest.integrations:test
+  packages:
+  - name: EdgeNewTest
+    version: "1.0"
+  - name: EdgeThirdPackage
+    version: "1.0"
+- serviceName: pub.date:getCurrentDate
+  packages:
+  - name: WmPublic
+    version: 11.0.0.0.608
+- serviceName: edge.newtest.integrations:doc
+  packages:
+  - name: EdgeNewTest
+    version: "1.0"
+  - name: EdgeThirdPackage
+    version: "1.0"
+- serviceName: edge.newtest.integrations:testDate
+  packages:
+  - name: EdgeNewTest
+    version: "1.0"
+  - name: EdgeThirdPackage
+    version: "1.0"
+- serviceName: pub.date:currentNanoTime
+  packages:
+  - name: WmPublic
+    version: 11.0.0.0.608
+configurations:
+    - name: server
+      properties:
+      - name: artConnection.EdgeJCDemo.edge.jcdemo.WmJDBCAdapter.com_wm_adapter_wmjdbc_JDBCAdapter.connections.myMac3.connectionManagerSettings.poolable
+        value: "false"
+      - name: artConnection.EdgeJCDemo.edge.jcdemo.WmJDBCAdapter.com_wm_adapter_wmjdbc_JDBCAdapter.connections.myMac2.connectionSettings.keyStore
+        value: ""
