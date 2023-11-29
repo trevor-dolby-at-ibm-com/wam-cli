@@ -5,6 +5,7 @@ import org.apache.maven.artifact.versioning.ComparableVersion;
 public class WmPackage {
 	
 	public String name;
+	
 	public String version;
 	
 	public String gitBranch;
@@ -20,9 +21,14 @@ public class WmPackage {
 	
 	public boolean isVersionInferiorTo(WmPackage pckg) {
 		
-		ComparableVersion version1 = new ComparableVersion(this.version);
-		ComparableVersion version2 = new ComparableVersion(pckg.version);
+		ComparableVersion version1 = this.version != null ? new ComparableVersion(this.version) : null;
+		ComparableVersion version2 = pckg.version != null ? new ComparableVersion(pckg.version) : null;
 
-		return version1.compareTo(version2) < 0;
+		if (version1 == null)
+			return false;
+		else if (version2 == null)
+			return true;
+		else
+			return version1.compareTo(version2) < 0;
 	}
 }

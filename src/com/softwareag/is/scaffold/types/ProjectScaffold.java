@@ -1,6 +1,7 @@
 package com.softwareag.is.scaffold.types;
 
 import java.util.List;
+import java.util.Map;
 
 public class ProjectScaffold {
 
@@ -9,4 +10,5 @@ public class ProjectScaffold {
 	public List<WmPackage> packages;
 	public List<Service> services;
 	public List<Configuration> configurations;
+	public Map<String, String> configurationVariables;
 }

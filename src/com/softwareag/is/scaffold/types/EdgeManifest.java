@@ -3,18 +3,52 @@ package com.softwareag.is.scaffold.types;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.softwareag.is.scaffold.types.Configuration.InvalidConfigurationVariablesFile;
+
 public class EdgeManifest {
 
-	public String version;
+	public String version = "1.0";
 	public Info info;
 	public List<WmPackage> packages;
 	public List<Configuration> configurations;
 	
 	
-	public void mergeScaffold(ProjectScaffold project) {
+	public void mergeScaffold(ProjectScaffold project, String service, String gitToken, String wpmToken) {
 		
-		for (WmPackage p : project.packages) {
-			addPackage(p);
+		if (service != null) {
+			
+			// only add packages that are referenced by the service
+			
+			for (Service s : project.services) {
+				if (s.serviceName.equals(service)) {
+					for (WmPackage x: s.packages) {
+												
+						for (WmPackage p : project.packages) {
+														
+							if (p.name.equals(x.name)) {
+								
+								if (gitToken != null && p.gitUrl != null)
+									p.gitToken = gitToken;
+								else if (wpmToken != null && p.wpmServer != null) 
+									p.wpmToken = wpmToken;
+								
+								addPackage(p);
+							}
+						}
+					}
+				}
+			}
+		} else {
+		
+			for (WmPackage p : project.packages) {
+				
+				if (gitToken != null && p.gitUrl != null)
+					p.gitToken = gitToken;
+				else if (wpmToken != null && p.wpmServer != null) 
+					p.wpmToken = wpmToken;
+					
+				addPackage(p);
+			}
 		}
 		
 		if (project.configurations != null) {
@@ -22,6 +56,34 @@ public class EdgeManifest {
 				mergeConfigurations(c);
 			}
 		}
+		
+		if (project.configurationVariables != null && project.configurationVariables.size() > 0) {
+			
+			Configuration c = null;
+			
+			if (this.configurations == null) {
+				this.configurations = new ArrayList<Configuration>();
+				
+				c = new Configuration();
+				c.name = "default";
+				this.configurations.add(c);
+			} else {
+				c = this.configurations.get(0);
+			}
+			
+			c.mergeConfiguration(project.configurationVariables);
+		}
+	}
+	
+	public void mergeConfiguratinVariables(String config) throws InvalidConfigurationVariablesFile {
+		
+		Configuration configuration = new Configuration(config);
+		
+		if (this.configurations == null) {
+			this.configurations = new ArrayList<Configuration>();
+		} 
+		
+		this.configurations.add(configuration);
 	}
 	
 	public void mergeConfigurations(Configuration config) {
@@ -71,6 +133,7 @@ public class EdgeManifest {
 		}
 		
 		if (!matched) {
+		
 			this.packages.add(pckge);
 		}
 		

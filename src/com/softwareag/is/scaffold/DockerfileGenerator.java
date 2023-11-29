@@ -14,15 +14,24 @@ public class DockerfileGenerator {
 	private EdgeManifest _manifest;
 	
 	private String _from = "sagcr.azurecr.io/webmethods-edge-runtime:latest";
-	
+	private String _targetDir = "/opt/softwareag/IntegrationServer";
+
+	private static final String FROM = "sagcr.azurecr.io/webmethods-edge-runtime:latest";
+	private static final String TARGET = "/opt/softwareag/IntegrationServer";
+
 	private static final String PROPS_DIR = "/opt/softwareag/IntegrationServer/application.properties";
 	private static final String WPM_BASE = "RUN /opt/softwareag/wpm/bin/wpm.sh install ";
 	
 	private static final String ENV_VALUE = "$env{";
 	
-	private static final String WPM_TOKEN_ARG = "-j ";
 	private static final String WPM_USER_ARG = "-u ";
+	private static final String WPM_PASSWORD_ARG = "-p ";
 	private static final String WPM_GITURL_ARG = "-r ";
+	
+	private static final String WPM_SERVER_ARG = "-ws ";
+	private static final String WPM_REG_ARG = "-wr ";
+	private static final String WPM_TOKEN_ARG = "-j ";
+	private static final String WPM_DIR_ARG = "-d ";
 	
 	public DockerfileGenerator(EdgeManifest manifest) {
 		this._manifest = manifest;
@@ -30,7 +39,11 @@ public class DockerfileGenerator {
 	
 	public DockerfileGenerator(EdgeManifest manifest, String baseImage) {
 		this(manifest);
-		this._from = baseImage;
+		this._from = baseImage != null ? baseImage : FROM;
+	}
+	
+	public void setTargetDir(String targetDir) {
+		this._targetDir = targetDir != null ? targetDir : TARGET;
 	}
 	
 	public String getDockerfile() {
@@ -43,10 +56,16 @@ public class DockerfileGenerator {
 			w.newLine();
 			w.newLine();
 			
+			w.append("WORKDIR /opt/softwareag/wpm");
+			w.newLine();
+			
 			for(WmPackage p : this._manifest.packages) {
 				w.append(generateWpmCommandForPackage(p));
 				w.newLine();
 			};
+			
+			w.append("WORKDIR /");
+			w.newLine();
 			
 			w.newLine();
 			
@@ -104,12 +123,21 @@ public class DockerfileGenerator {
 			wpm.append(WPM_USER_ARG + p.gitUsername + " ");
 		
 		if (p.gitToken != null)
-			wpm.append(WPM_TOKEN_ARG + p.gitToken + " ");		
+			wpm.append(WPM_PASSWORD_ARG + p.gitToken + " ");		
 		
-		if (p.gitUrl != null) {
+		if (p.gitUrl != null) 
 			wpm.append(WPM_GITURL_ARG + p.gitUrl + " ");		
-
-		}
+		
+		if (p.wpmServer != null) 
+			wpm.append(WPM_SERVER_ARG + p.wpmServer + " ");
+		
+		if (p.wpmRegistry != null) 
+			wpm.append(WPM_REG_ARG + p.wpmRegistry + " ");
+		
+		if (p.wpmToken != null) 
+			wpm.append(WPM_TOKEN_ARG + p.wpmToken + " ");
+		
+		wpm.append(WPM_DIR_ARG +_targetDir + " ");
 		
 		wpm.append(p.name);
 		

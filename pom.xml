@@ -2,9 +2,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>WAM</groupId>
-	<artifactId>WAM</artifactId>
-	<version>0.0.1</version>
+	<groupId>wam</groupId>
+	<artifactId>wam</artifactId>
+	<version>0.0.3</version>
 	<packaging>jar</packaging>
 	<name>webMethods Application Manager (WAM)</name>
 	<description>Generates Dockerfile for your webMethods.io Integration project</description>
