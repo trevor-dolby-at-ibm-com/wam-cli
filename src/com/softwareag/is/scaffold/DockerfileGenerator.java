@@ -71,14 +71,15 @@ public class DockerfileGenerator {
 			
 			if (this._manifest.configurations != null && this._manifest.configurations.size() > 0) {
 				w.append("COPY application.properties " + PROPS_DIR);
+				w.newLine();
 				
-				for(Configuration c : this._manifest.configurations) {
+				/*for(Configuration c : this._manifest.configurations) {
 					for (Property p : c.properties) {
 						if (p.value.startsWith(ENV_VALUE)) {
 							w.append("ENV " + stripEnvMarker(p.value));
 						}
 					}
-				}
+				}*/
 			}
 			
 			w.flush();
@@ -141,11 +142,16 @@ public class DockerfileGenerator {
 		
 		wpm.append(p.name);
 		
+		if(p.gitTag != null && p.gitTag.length() > 0)
+			wpm.append(":" + p.gitTag);
+		else if (p.gitBranch != null && p.gitBranch.length() > 0 && !p.gitBranch.equals("main") && !p.gitBranch.equals("master"))
+			wpm.append(":" + p.gitBranch);
+		
 		return wpm.toString();
 	}
 	
 	private String stripEnvMarker(String value) {
 		
-		return value.substring(0, value.length()-2);
+		return value.substring(5, value.length()-1);
 	}
 }

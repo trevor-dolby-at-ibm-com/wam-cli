@@ -1,3 +1,4 @@
 target
 Dockerfile
 application.properties
+.DS_Store
