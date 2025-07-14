@@ -13,10 +13,10 @@ public class DockerfileGenerator {
 
 	private EdgeManifest _manifest;
 	
-	private String _from = "sagcr.azurecr.io/webmethods-edge-runtime:latest";
+	private String _from = "iwhicr.azurecr.io/webmethods-edge-runtime:11.2.0";
 	private String _targetDir = "/opt/softwareag/IntegrationServer";
-
-	private static final String FROM = "sagcr.azurecr.io/webmethods-edge-runtime:latest";
+	
+	private static final String FROM = "iwhicr.azurecr.io/webmethods-edge-runtime:11.2.0";
 	private static final String TARGET = "/opt/softwareag/IntegrationServer";
 
 	private static final String PROPS_DIR = "/opt/softwareag/IntegrationServer/application.properties";
@@ -32,7 +32,7 @@ public class DockerfileGenerator {
 	private static final String WPM_REG_ARG = "-wr ";
 	private static final String WPM_TOKEN_ARG = "-j ";
 	private static final String WPM_DIR_ARG = "-d ";
-	
+
 	public DockerfileGenerator(EdgeManifest manifest) {
 		this._manifest = manifest;
 	}
@@ -121,10 +121,10 @@ public class DockerfileGenerator {
 		wpm.append(WPM_BASE);
 		
 		if (p.gitUsername != null)
-			wpm.append(WPM_USER_ARG + p.gitUsername + " ");
+			addPossibleSecret(wpm, WPM_USER_ARG, p.gitUsername);
 		
 		if (p.gitToken != null)
-			wpm.append(WPM_PASSWORD_ARG + p.gitToken + " ");		
+			addPossibleSecret(wpm, WPM_PASSWORD_ARG, p.gitToken);
 		
 		if (p.gitUrl != null) 
 			wpm.append(WPM_GITURL_ARG + p.gitUrl + " ");		
@@ -136,7 +136,7 @@ public class DockerfileGenerator {
 			wpm.append(WPM_REG_ARG + p.wpmRegistry + " ");
 		
 		if (p.wpmToken != null) 
-			wpm.append(WPM_TOKEN_ARG + p.wpmToken + " ");
+			addPossibleSecret(wpm, WPM_TOKEN_ARG, p.wpmToken);
 		
 		wpm.append(WPM_DIR_ARG +_targetDir + " ");
 		
@@ -154,4 +154,16 @@ public class DockerfileGenerator {
 		
 		return value.substring(5, value.length()-1);
 	}
+	
+	private void addPossibleSecret(StringBuilder wpm, String optionName, String optionValue) {
+		if (optionValue.startsWith(ENV_VALUE)) {
+			String envVar = stripEnvMarker(optionValue);
+			System.out.println("Using build secret; add '--secret id="+envVar+"' to docker build line");
+			wpm.insert(4, "--mount=type=secret,id="+envVar+",mode=0444 ");
+			wpm.append(optionName + "`cat /run/secrets/"+envVar+"` ");
+		} else {
+			wpm.append(optionName + optionValue + " ");
+		}
+	}
+	
 }
