@@ -121,10 +121,10 @@ public class DockerfileGenerator {
 		wpm.append(WPM_BASE);
 		
 		if (p.gitUsername != null)
-			addPossibleSecret(wpm, WPM_USER_ARG, p.gitUsername);
+			wpm.append(WPM_USER_ARG + p.gitUsername + " ");
 		
 		if (p.gitToken != null)
-			addPossibleSecret(wpm, WPM_PASSWORD_ARG, p.gitToken);
+			addPossibleSecret(wpm, WPM_PASSWORD_ARG, p.gitToken, p.name);
 		
 		if (p.gitUrl != null) 
 			wpm.append(WPM_GITURL_ARG + p.gitUrl + " ");		
@@ -136,7 +136,7 @@ public class DockerfileGenerator {
 			wpm.append(WPM_REG_ARG + p.wpmRegistry + " ");
 		
 		if (p.wpmToken != null) 
-			addPossibleSecret(wpm, WPM_TOKEN_ARG, p.wpmToken);
+			addPossibleSecret(wpm, WPM_TOKEN_ARG, p.wpmToken, p.name);
 		
 		wpm.append(WPM_DIR_ARG +_targetDir + " ");
 		
@@ -155,13 +155,14 @@ public class DockerfileGenerator {
 		return value.substring(5, value.length()-1);
 	}
 	
-	private void addPossibleSecret(StringBuilder wpm, String optionName, String optionValue) {
+	private void addPossibleSecret(StringBuilder wpm, String optionName, String optionValue, String packageName) {
 		if (optionValue.startsWith(ENV_VALUE)) {
 			String envVar = stripEnvMarker(optionValue);
-			System.out.println("Using build secret; add '--secret id="+envVar+"' to docker build line");
+			System.out.println("Using build secret for package "+packageName+"; add '--secret id="+envVar+"' to docker build line");
 			wpm.insert(4, "--mount=type=secret,id="+envVar+",mode=0444 ");
 			wpm.append(optionName + "`cat /run/secrets/"+envVar+"` ");
 		} else {
+			System.out.println("Plaintext password used for package "+packageName+"; consider using env vars (e.g. $env{GIT_TOKEN}) and buildx secrets");
 			wpm.append(optionName + optionValue + " ");
 		}
 	}

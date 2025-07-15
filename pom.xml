@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>wam</groupId>
 	<artifactId>wam</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>jar</packaging>
 	<name>webMethods Application Manager (WAM)</name>
 	<description>Generates Dockerfile for your webMethods.io Integration project</description>
